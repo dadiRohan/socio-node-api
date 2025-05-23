@@ -2,7 +2,12 @@ const Post = require('../models/Post');
 
 const getPosts = async (req, res) => {
   try {
-    const posts = (await Post.find()).reverse();
+    // const posts = (await Post.find()).reverse();
+
+    const posts = await Post.find()
+      .populate('created_by','username email')  // This populates the profile details
+      .sort({ created_at: -1 });  // Instead of .reverse(), use .sort()
+
     res.status(200).json(posts);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });

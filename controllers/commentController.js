@@ -7,7 +7,10 @@ const getComments = async (req, res) => {
         if (!postId) {
             return res.status(400).json({ message: 'Post ID is required' });
         }
-        const comments = await (await Comment.find({ postId })).reverse();
+        // const comments = await (await Comment.find({ postId })).reverse();
+        const comments = await Comment.find({ postId })
+              .populate('created_by','username email')  // This populates the profile details
+              .sort({ created_at: -1 });  // Instead of .reverse(), use .sort()
 
         res.status(200).json(comments);
     } catch (error) {
