@@ -3,7 +3,7 @@ const Like = require('../models/Like');
 const getLikes = async (req, res) => {
   try {
     const { post_id } = req.params;
-    const likes = await Like.find({post_id});
+    const likes = await Like.find({post_id}).countDocuments();
     res.status(200).json(likes);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
