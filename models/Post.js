@@ -4,6 +4,7 @@ const postSchema = new mongoose.Schema({
     post: { type: String, required: true },
     imgPath: { type: String, required: false },
     created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'profile' },
+    likes: { type: Number, default: 0 },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
 });
