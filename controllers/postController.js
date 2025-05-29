@@ -16,11 +16,12 @@ const getPosts = async (req, res) => {
 
 const createPost = async (req, res) => {
     try {
-        const { post, imgPath , created_by } = req.body;
+        const { post, imgPath , created_by , likes } = req.body;
         const newPost = new Post({
         post,
         imgPath,
         created_by,
+        likes,
         created_at  : new Date(),
         updated_at  : new Date(),
         });

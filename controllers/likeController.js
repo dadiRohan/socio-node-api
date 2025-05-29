@@ -1,4 +1,5 @@
 const Like = require('../models/Like');
+const Post = require('../models/Post');
 
 const getLikes = async (req, res) => {
   try {
@@ -16,6 +17,13 @@ const createLike = async (req, res) => {
         const existingLike = await Like.findOne({ post_id, user_id });
         if (existingLike) {
             await Like.findOneAndDelete({ post_id, user_id });
+
+            const likesCount = await Like.find({ post_id }).countDocuments();
+
+            Post.findByIdAndUpdate(post_id, { $inc: { likes: -1 } }, { new: true });
+
+            console.log(`Likes count for post ${post_id}: ${likesCount}`);
+
             res.status(200).json({ message: 'Like removed' });
         }else{
             const newLike = new Like({
@@ -23,6 +31,12 @@ const createLike = async (req, res) => {
                 user_id
             });
             const savedLike = await newLike.save();
+
+            const likesCount = await Like.find({ post_id }).countDocuments();
+
+            await Post.findByIdAndUpdate(post_id, { $inc: { likes: 1 } }, { new: true });
+            console.log(`Likes count for post ${post_id}: ${likesCount}`);
+
             res.status(201).json(savedLike);
         }
     } catch (error) {
