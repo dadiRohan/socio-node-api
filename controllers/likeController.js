@@ -15,33 +15,31 @@ const createLike = async (req, res) => {
     try {
         const { post_id, user_id } = req.body;
         const existingLike = await Like.findOne({ post_id, user_id });
+
         if (existingLike) {
+            // Remove like
             await Like.findOneAndDelete({ post_id, user_id });
 
-            const likesCount = await Like.find({ post_id }).countDocuments();
-
-            Post.findByIdAndUpdate(post_id, { $inc: { likes: -1 } }, { new: true });
-
-            console.log(`Likes count for post ${post_id}: ${likesCount}`);
+            // Update like count
+            const updatedCount = await Like.countDocuments({ post_id });
+            await Post.findByIdAndUpdate(post_id, { likes: updatedCount });
 
             res.status(200).json({ message: 'Like removed' });
-        }else{
-            const newLike = new Like({
-                post_id,
-                user_id
-            });
-            const savedLike = await newLike.save();
+        } else {
+            // Add like
+            const newLike = new Like({ post_id, user_id });
+            await newLike.save();
 
-            const likesCount = await Like.find({ post_id }).countDocuments();
+            // Update like count
+            const updatedCount = await Like.countDocuments({ post_id });
+            await Post.findByIdAndUpdate(post_id, { likes: updatedCount });
 
-            await Post.findByIdAndUpdate(post_id, { $inc: { likes: 1 } }, { new: true });
-            console.log(`Likes count for post ${post_id}: ${likesCount}`);
-
-            res.status(201).json(savedLike);
+            res.status(201).json({ message: 'Like added' });
         }
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Server error' });
     }
-}
+};
 
 module.exports = { getLikes, createLike };
